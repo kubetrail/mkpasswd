@@ -1,8 +1,8 @@
 package flags
 
 const (
-	GoogleProjectID              = "google-project-id"              // Google KMS project ID
-	GoogleApplicationCredentials = "google-application-credentials" // Google service account with KMS encrypter/decrypter role
+	GoogleProjectID              = "google-project-id"              // Google project ID
+	GoogleApplicationCredentials = "google-application-credentials" // Google service account with secrets manager access
 )
 
 const (
