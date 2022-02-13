@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"google.golang.org/api/iterator"
-
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
+	"google.golang.org/api/iterator"
 	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
 
@@ -38,7 +37,7 @@ func List(cmd *cobra.Command, args []string) error {
 		Parent:    fmt.Sprintf("projects/%s", persistentFlags.Project),
 		PageSize:  0,
 		PageToken: "",
-		Filter:    "labels.managed-by=mkpasswd",
+		Filter:    fmt.Sprintf("labels.%s=%s", LabelKey, AppName),
 	}
 
 	// Call the API.
