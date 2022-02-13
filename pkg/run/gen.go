@@ -67,7 +67,7 @@ func Gen(cmd *cobra.Command, args []string) error {
 				},
 			},
 			Labels: map[string]string{
-				"managed-by": "mkpasswd",
+				LabelKey: AppName,
 			},
 		},
 	}
@@ -77,11 +77,12 @@ func Gen(cmd *cobra.Command, args []string) error {
 		apiErr, ok := err.(*apierror.APIError)
 		if ok {
 			if apiErr.GRPCStatus().Code() == codes.AlreadyExists {
-				getSecretReq := &secretmanagerpb.GetSecretRequest{
-					Name: fmt.Sprintf("projects/%s/secrets/%s", persistentFlags.Project, name),
-				}
-
-				secret, err = client.GetSecret(ctx, getSecretReq)
+				secret, err = client.GetSecret(
+					ctx,
+					&secretmanagerpb.GetSecretRequest{
+						Name: fmt.Sprintf("projects/%s/secrets/%s", persistentFlags.Project, name),
+					},
+				)
 				if err != nil {
 					return fmt.Errorf("failed to get secret: %w", err)
 				}
@@ -91,6 +92,11 @@ func Gen(cmd *cobra.Command, args []string) error {
 		} else {
 			return fmt.Errorf("failed to create a secret: %T, %w", err, err)
 		}
+	}
+
+	labels := secret.GetLabels()
+	if value, ok := labels[LabelKey]; !ok || value != AppName {
+		return fmt.Errorf("secret is not being managed by this app")
 	}
 
 	// Declare the payload to store.

@@ -1,6 +1,10 @@
 # mkpasswd
 CLI tool for generating and managing versions of passwords on Google secret manager.
 
+## disclaimer
+>The use of this tool does not guarantee password security or suitability
+for any particular use. Please review the code and use at your own risk.
+
 ## installation
 Download the code to a folder and cd to the folder, then run
 ```bash
@@ -36,6 +40,8 @@ mkpasswd gen --name=my-passwd
 ------------+------------------+----------
   my-passwd   IwC9j^hPJ5%t0:v2         1  
 ```
+> Please note that the password name, once created, cannot be changed later
+
 As you can see, if the named password does not already exist, it's version
 will be at `1`. Issuing the same command again using an existing named password
 will generate a new version:
@@ -119,4 +125,11 @@ deleted forever.
 > Please use caution when using this command
 ```bash
 mkpasswd delete 188c3b2e-d42e-454f-8e50-40564e058f27
+```
+The above command will ask for confirmation, however, `--force` option
+can be used to skip the confirmation and delete the secret without any
+confirmation.
+
+```bash
+mkpasswd delete 188c3b2e-d42e-454f-8e50-40564e058f27 --force
 ```

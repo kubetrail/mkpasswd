@@ -17,17 +17,28 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/kubetrail/mkpasswd/pkg/run"
 	"github.com/spf13/cobra"
 )
 
+var listCmdLong = `List all named passwords managed by this app
+Internally it filters all secrets using label: labelKey=appName`
+
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List named passwords",
-	Long: `List all named passwords managed by this app
-Internally it filters all secrets using label: managed-by=mkpasswd`,
+	Long: strings.ReplaceAll(
+		strings.ReplaceAll(
+			listCmdLong,
+			"labelKey",
+			run.LabelKey,
+		),
+		"appName",
+		run.AppName,
+	),
 	RunE:    run.List,
 	Args:    cobra.ExactArgs(0),
 	Example: fmt.Sprintf("%s list", run.AppName),

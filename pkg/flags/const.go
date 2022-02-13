@@ -13,4 +13,5 @@ const (
 	NoUppercase = "no-uppercase"
 	AllowRepeat = "allow-repeat"
 	Version     = "version"
+	Force       = "force"
 )

@@ -43,6 +43,21 @@ func Get(cmd *cobra.Command, args []string) error {
 	}
 	defer client.Close()
 
+	secret, err := client.GetSecret(
+		ctx,
+		&secretmanagerpb.GetSecretRequest{
+			Name: fmt.Sprintf("projects/%s/secrets/%s", persistentFlags.Project, name),
+		},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to get secret: %w", err)
+	}
+
+	labels := secret.GetLabels()
+	if value, ok := labels[LabelKey]; !ok || value != AppName {
+		return fmt.Errorf("secret is not being managed by this app")
+	}
+
 	// Build the request.
 	accessRequest := &secretmanagerpb.AccessSecretVersionRequest{
 		Name: fmt.Sprintf("projects/%s/secrets/%s/versions/%s", persistentFlags.Project, name, version),

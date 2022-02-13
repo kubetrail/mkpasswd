@@ -23,7 +23,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var long = `To load completions:
+var longCompletionCmd = `To load completions:
 
 Bash:
 
@@ -65,9 +65,12 @@ PowerShell:
 
 // completionCmd represents the completion command
 var completionCmd = &cobra.Command{
-	Use:                   "completion",
-	Short:                 "Generate shell completion",
-	Long:                  strings.ReplaceAll(long, "appName", run.AppName),
+	Use:   "completion",
+	Short: "Generate shell completion",
+	Long: strings.ReplaceAll(
+		longCompletionCmd,
+		"appName",
+		run.AppName),
 	DisableFlagsInUseLine: true,
 	ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
 	Args:                  cobra.ExactValidArgs(1),

@@ -2,6 +2,10 @@ package run
 
 import (
 	"fmt"
+	"path/filepath"
+
+	"github.com/kubetrail/mkpasswd/pkg/flags"
+	"github.com/spf13/viper"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"github.com/spf13/cobra"
@@ -13,7 +17,10 @@ func Delete(cmd *cobra.Command, args []string) error {
 	ctx := cmd.Context()
 	persistentFlags := getPersistentFlags(cmd)
 
+	_ = viper.BindPFlag(flags.Force, cmd.Flags().Lookup(filepath.Base(flags.Force)))
+
 	name := args[0]
+	force := viper.GetBool(flags.Force)
 
 	if err := setAppCredsEnvVar(persistentFlags.ApplicationCredentials); err != nil {
 		err := fmt.Errorf("could not set Google Application credentials env. var: %w", err)
@@ -22,6 +29,20 @@ func Delete(cmd *cobra.Command, args []string) error {
 
 	if len(name) == 0 {
 		return fmt.Errorf("please provide name of the password")
+	}
+
+	if !force {
+		if _, err := fmt.Fprintf(cmd.OutOrStdout(), "Type secret name to delete: "); err != nil {
+			return fmt.Errorf("failed to write to output: %w", err)
+		}
+		var input string
+		if _, err := fmt.Fscanln(cmd.InOrStdin(), &input); err != nil {
+			return fmt.Errorf("failed to read from input: %w", err)
+		}
+
+		if input != name {
+			return fmt.Errorf("input does not match secret name")
+		}
 	}
 
 	if errs := validation.IsDNS1123Label(name); len(errs) > 0 {
@@ -34,6 +55,21 @@ func Delete(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to create secret manager client: %w", err)
 	}
 	defer client.Close()
+
+	secret, err := client.GetSecret(
+		ctx,
+		&secretmanagerpb.GetSecretRequest{
+			Name: fmt.Sprintf("projects/%s/secrets/%s", persistentFlags.Project, name),
+		},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to get secret: %w", err)
+	}
+
+	labels := secret.GetLabels()
+	if value, ok := labels[LabelKey]; !ok || value != AppName {
+		return fmt.Errorf("secret is not being managed by this app")
+	}
 
 	// Build the request.
 	deleteRequest := &secretmanagerpb.DeleteSecretRequest{
