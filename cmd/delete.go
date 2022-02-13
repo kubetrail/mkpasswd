@@ -20,7 +20,6 @@ import (
 	"path/filepath"
 
 	"github.com/kubetrail/mkpasswd/pkg/flags"
-
 	"github.com/kubetrail/mkpasswd/pkg/run"
 	"github.com/spf13/cobra"
 )

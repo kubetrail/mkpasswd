@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/kubetrail/mkpasswd/pkg/flags"
-	"github.com/spf13/viper"
-
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
+	"github.com/kubetrail/mkpasswd/pkg/flags"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 	"k8s.io/apimachinery/pkg/util/validation"
 )
