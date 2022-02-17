@@ -32,6 +32,7 @@ secret manager. If the named password already exists
 a new version will be created without destroying
 the older version`,
 	RunE: run.Gen,
+	Args: cobra.ExactArgs(0),
 }
 
 func init() {
